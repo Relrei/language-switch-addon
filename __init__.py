@@ -20,8 +20,8 @@ switch add-ons on extensions.blender.org, no code is taken from them.
 bl_info = {
     "name": "Language Switch",
     "author": "togetofu",
-    "version": (1, 5, 0),
-    "blender": (3, 6, 0),
+    "version": (1, 6, 0),
+    "blender": (2, 93, 0),
     "location": "Top Bar (right end), Ctrl+Shift+L",
     "description": "Switch the interface language between two languages",
     "category": "Interface",
@@ -36,6 +36,8 @@ from bpy.app.translations import pgettext_tip as tip_
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 
 ENGLISH = 'en_US'
+# The oldest version tested, as in bl_info (which Blender removes when loading an extension).
+MIN_BLENDER = (2, 93, 0)
 DEFAULT_FIRST = ENGLISH
 DEFAULT_SECOND = 'ja_JP'
 SHORTCUT = dict(type='L', value='PRESS', ctrl=True, shift=True)
@@ -311,6 +313,9 @@ classes = (
 
 
 def register():
+    # Older versions are not tested: refuse to be enabled there instead of half working.
+    if bpy.app.version < MIN_BLENDER:
+        raise RuntimeError("Language Switch needs Blender %d.%d or later" % MIN_BLENDER[:2])
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.TOPBAR_HT_upper_bar.append(draw_topbar)

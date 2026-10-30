@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "falcon_language"
-version = "1.5.0"
+version = "1.6.0"
 name = "Language Switch"
 tagline = "Toggle the interface language between two languages you choose"
 maintainer = "togetofu"
