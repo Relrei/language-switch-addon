@@ -22,9 +22,9 @@ A free Blender add-on that switches the interface language between two languages
 
 Download a zip from [Releases](../../releases) (do not unpack it).
 
-- **As an extension (recommended)**: `language_switch-<version>-extension.zip`
+- **As an extension (Blender 4.2 or later, recommended)**: `language_switch-<version>-extension.zip`
   Edit > Preferences > Get Extensions > the menu at the top right > **Install from Disk...**
-- **As a legacy add-on**: `language_switch.zip`
+- **As a legacy add-on (Blender 3.6 or later)**: `language_switch.zip`
   Edit > Preferences > Add-ons > the menu at the top right > **Install from Disk...**, then enable **Language Switch**.
 
 Install only one of the two.
@@ -43,11 +43,17 @@ Pressing Ctrl+Shift+L while another language is shown goes back to the first lan
 
 ## Compatibility
 
-Requires Blender 4.5 or later.
+Requires Blender 3.6 or later.
+
+Notes by version:
+
+- **Blender 3.6 to 4.1**: use the legacy add-on zip (extensions start with Blender 4.2). Reports (the messages in the status bar) are not translated, because these versions cannot translate reports. Everything else works the same.
+- **Blender 4.2 and later**: either zip works. The extension is recommended.
 
 Tested with:
 
-- Blender 4.5.15 LTS on Linux
+- Blender 3.6.23 LTS on Linux (legacy add-on)
+- Blender 4.5.15 LTS on Linux (version 1.4.0; 1.5.0 only adds code for versions before 4.0)
 - Blender 5.2.0 LTS and 5.2.1 LTS on Linux
 - Blender 5.3 Alpha on Linux
 - Blender 5.2.3 LTS for Windows, run under Wine on Linux (not yet tested on a real Windows PC)
@@ -78,9 +84,9 @@ Blender のインターフェースの言語を、2 つの言語の間でワン�
 
 [Releases](../../releases) から zip を落とします(展開はしません)。
 
-- **拡張機能として(おすすめ)**: `language_switch-<版>-extension.zip`
+- **拡張機能として(Blender 4.2 以降・おすすめ)**: `language_switch-<版>-extension.zip`
   編集 > プリファレンス > エクステンションを入手 > 右上のメニュー > **ディスクからインストール...**
-- **従来のアドオンとして**: `language_switch.zip`
+- **従来のアドオンとして(Blender 3.6 以降)**: `language_switch.zip`
   編集 > プリファレンス > アドオン > 右上のメニュー > **ディスクからインストール...** の後、**Language Switch** を有効にします。
 
 どちらか片方だけを入れてください。
@@ -97,11 +103,17 @@ Blender のインターフェースの言語を、2 つの言語の間でワン�
 
 ### 対応する版
 
-Blender 4.5 以降で動きます。
+Blender 3.6 以降で動きます。
+
+版ごとの注意:
+
+- **Blender 3.6〜4.1**: 従来のアドオンの zip を使ってください(拡張機能は Blender 4.2 からです)。この版の Blender にはレポートを翻訳する機能が無いので、レポート(画面下に出るお知らせ)は翻訳されません。他は同じように動きます。
+- **Blender 4.2 以降**: どちらの zip でも使えます。拡張機能がおすすめです。
 
 試した版:
 
-- Linux の Blender 4.5.15 LTS
+- Linux の Blender 3.6.23 LTS(従来のアドオン)
+- Linux の Blender 4.5.15 LTS(1.4.0 で。1.5.0 で足したのは 4.0 より前の版のための所だけです)
 - Linux の Blender 5.2.0 LTS・5.2.1 LTS
 - Linux の Blender 5.3 Alpha
 - Windows 版 Blender 5.2.3 LTS(Linux の Wine の上で。本物の Windows ではまだ試していません)

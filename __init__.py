@@ -20,15 +20,18 @@ switch add-ons on extensions.blender.org, no code is taken from them.
 bl_info = {
     "name": "Language Switch",
     "author": "togetofu",
-    "version": (1, 4, 0),
-    "blender": (4, 5, 0),
+    "version": (1, 5, 0),
+    "blender": (3, 6, 0),
     "location": "Top Bar (right end), Ctrl+Shift+L",
     "description": "Switch the interface language between two languages",
     "category": "Interface",
 }
 
 import bpy
-from bpy.app.translations import pgettext_rpt as rpt_
+try:
+    from bpy.app.translations import pgettext_rpt as rpt_
+except ImportError:  # Blender before 4.0 does not translate reports
+    from bpy.app.translations import pgettext_tip as rpt_
 from bpy.app.translations import pgettext_tip as tip_
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 
@@ -133,7 +136,8 @@ def set_language(context, language, remember=True):
         # Otherwise the switch would change nothing on screen.
         view.use_translate_interface = True
         view.use_translate_tooltips = True
-        view.use_translate_reports = True
+        if hasattr(view, "use_translate_reports"):  # Blender 4.0 and later
+            view.use_translate_reports = True
     view.language = language
 
 
