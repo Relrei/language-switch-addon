@@ -5,10 +5,12 @@
 """Switch the interface language between two languages in one click.
 
 Two buttons at the right end of the Top Bar ("EN" and "JA" by default) and one shortcut,
-Ctrl+Shift+L, which toggles between the two. The first language is English and the second one is
-Japanese unless others are chosen in the add-on preferences. Switching to a translated language
-also turns on the translation of the interface, tooltips and reports (Preferences > Interface >
-Translation), which is what makes the switch visible; new data names are left alone.
+Ctrl+Shift+L, which toggles between the two. The first language is the one set in Preferences >
+Interface > Language ("Use Blender's Language Setting", on by default) or one chosen in the add-on
+preferences (English by default); the second one is Japanese unless another one is chosen there.
+Switching to a translated language also turns on the translation of the interface, tooltips and
+reports (Preferences > Interface > Translation), which is what makes the switch visible; new data
+names are left alone.
 
 The preference is changed like any other one, so it is saved with the preferences as usual.
 Written for Falcon Engine; the idea (a one-click language toggle) is the same as the language
@@ -18,8 +20,8 @@ switch add-ons on extensions.blender.org, no code is taken from them.
 bl_info = {
     "name": "Language Switch",
     "author": "togetofu",
-    "version": (1, 2, 0),
-    "blender": (5, 2, 0),
+    "version": (1, 4, 0),
+    "blender": (4, 5, 0),
     "location": "Top Bar (right end), Ctrl+Shift+L",
     "description": "Switch the interface language between two languages",
     "category": "Interface",
@@ -28,7 +30,7 @@ bl_info = {
 import bpy
 from bpy.app.translations import pgettext_rpt as rpt_
 from bpy.app.translations import pgettext_tip as tip_
-from bpy.props import EnumProperty, StringProperty
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 
 ENGLISH = 'en_US'
 DEFAULT_FIRST = ENGLISH
@@ -42,9 +44,14 @@ _language_items_store = []
 
 def _languages():
     """{identifier: name} of the languages this build offers."""
+    # The items of the language enum are dynamic, and Blender 4.5 lists only the static one
+    # ("Automatic") in bl_rna, so the identifiers come from the translations instead.
     try:
-        prop = bpy.context.preferences.view.bl_rna.properties["language"]
-        return {item.identifier: item.name for item in prop.enum_items}
+        view = bpy.context.preferences.view
+        identifiers = ['DEFAULT', ENGLISH, *bpy.app.translations.locales]
+        names = {identifier: bpy.types.UILayout.enum_item_name(view, "language", identifier)
+                 for identifier in identifiers}
+        return {identifier: name for identifier, name in names.items() if name}
     except Exception:
         return {}
 
@@ -59,13 +66,17 @@ def _prefs(context=None):
     return addon.preferences if addon else None
 
 
+def _resolve(language):
+    """Resolves "Automatic" to the language Blender uses."""
+    if language == 'DEFAULT':
+        return bpy.app.translations.locale or ENGLISH
+    return language
+
+
 def current_language(context=None):
     """The language in effect (resolves "Automatic" to what Blender uses)."""
     context = context or bpy.context
-    language = context.preferences.view.language
-    if language == 'DEFAULT':
-        language = bpy.app.translations.locale or ENGLISH
-    return language
+    return _resolve(context.preferences.view.language)
 
 
 def _chosen(context, name, default):
@@ -75,8 +86,29 @@ def _chosen(context, name, default):
 
 
 def first_language(context=None):
-    """The first language chosen in the add-on preferences (English by default)."""
+    """The first language: the one set in Preferences > Interface when "Use Blender's Language
+    Setting" is on (the last one set there while the second language is shown), else the one
+    chosen in the add-on preferences (English by default). May be "DEFAULT" (Automatic)."""
+    context = context or bpy.context
+    prefs = _prefs(context)
+    if prefs and prefs.use_blender_language:
+        language = context.preferences.view.language
+        if _resolve(language) != second_language(context):
+            return language
+        return prefs.home_language if prefs.home_language in _languages() else ENGLISH
     return _chosen(context, "first_language", DEFAULT_FIRST)
+
+
+def first_language_resolved(context=None):
+    """The first language with "Automatic" resolved. While another language is shown, Blender
+    resolves "Automatic" to that one, so the language it stood for is the remembered one."""
+    context = context or bpy.context
+    language = first_language(context)
+    prefs = _prefs(context)
+    if (language == 'DEFAULT' and prefs and prefs.use_blender_language
+            and context.preferences.view.language != 'DEFAULT' and prefs.home_resolved):
+        return prefs.home_resolved
+    return _resolve(language)
 
 
 def second_language(context=None):
@@ -89,9 +121,15 @@ def short_code(language):
     return (language or "?").split("_")[0].split("@")[0].upper()
 
 
-def set_language(context, language):
+def set_language(context, language, remember=True):
     view = context.preferences.view
-    if not _is_english(language):
+    prefs = _prefs(context)
+    if (remember and prefs and prefs.use_blender_language
+            and current_language(context) != second_language(context)):
+        # The language set in Blender, to come back to from the second language.
+        prefs.home_language = view.language
+        prefs.home_resolved = current_language(context)
+    if not _is_english(_resolve(language)):
         # Otherwise the switch would change nothing on screen.
         view.use_translate_interface = True
         view.use_translate_tooltips = True
@@ -100,9 +138,12 @@ def set_language(context, language):
 
 
 def _language_items(self, context):
+    languages = _languages()
+    # Numbered by identifier: the names follow the interface language, so their order changes.
+    numbers = {identifier: index for index, identifier in enumerate(sorted(languages))}
     _language_items_store[:] = [
-        (identifier, name, "", index)
-        for index, (identifier, name) in enumerate(sorted(_languages().items(), key=lambda kv: kv[1]))
+        (identifier, name, "", numbers[identifier])
+        for identifier, name in sorted(languages.items(), key=lambda kv: kv[1])
         if identifier != 'DEFAULT'
     ]
     return _language_items_store
@@ -128,7 +169,7 @@ def _language_choice(stored_name, other_name):
                 # Already showing the old language (and it is not the other one too): show the new
                 # one right away.
                 if switch:
-                    set_language(context, identifier)
+                    set_language(context, identifier, remember=False)
                 return
 
     return get, set
@@ -141,6 +182,21 @@ _second_get, _second_set = _language_choice("second_language", "first_language")
 class FalconLanguagePreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
 
+    use_blender_language: BoolProperty(
+        name="Use Blender's Language Setting",
+        description="Use the language set in Preferences > Interface > Language as the first language",
+        default=True,
+    )
+    # The language set in Blender before switching to the second one ("DEFAULT" for Automatic).
+    home_language: StringProperty(
+        name="Home Language",
+        default="",
+    )
+    # What "Automatic" stood for when it was remembered.
+    home_resolved: StringProperty(
+        name="Home Language (Resolved)",
+        default="",
+    )
     # Stored as the identifier ("ja_JP"), so it survives builds whose language lists differ.
     first_language: StringProperty(
         name="First Language",
@@ -168,9 +224,20 @@ class FalconLanguagePreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
-        layout.prop(self, "first_language_choice")
+        layout.prop(self, "use_blender_language")
+        if self.use_blender_language:
+            # Shown greyed out: it follows Preferences > Interface > Language.
+            first = first_language_resolved(context)
+            split = layout.split(factor=0.4)
+            split.enabled = False
+            row = split.row()
+            row.alignment = 'RIGHT'
+            row.label(text=tip_("First Language"))
+            split.label(text=_languages().get(first, first), translate=False)
+        else:
+            layout.prop(self, "first_language_choice")
         layout.prop(self, "second_language_choice")
-        if first_language(context) == second_language(context):
+        if first_language_resolved(context) == second_language(context):
             layout.label(text=tip_("Choose two different languages"), icon='ERROR')
         layout.label(text=tip_("Ctrl+Shift+L switches between these two languages"))
 
@@ -210,7 +277,7 @@ class WM_OT_falcon_language_toggle(bpy.types.Operator):
         second = second_language(context)
         # Any language other than the first one (the second one, or one chosen elsewhere) goes
         # back to the first one.
-        target = second if current_language(context) == first else first
+        target = second if current_language(context) == first_language_resolved(context) else first
         if target not in _languages():
             self.report({'WARNING'}, rpt_("Language not available: %s") % target)
             return {'CANCELLED'}
@@ -224,9 +291,11 @@ def draw_topbar(self, context):
         return
     current = current_language(context)
     row = self.layout.row(align=True)
-    for language in (first_language(context), second_language(context)):
-        props = row.operator("wm.falcon_language_set", text=short_code(language), translate=False,
-                             depress=current == language)
+    second = second_language(context)
+    for language, resolved in ((first_language(context), first_language_resolved(context)),
+                               (second, second)):
+        props = row.operator("wm.falcon_language_set", text=short_code(resolved),
+                             translate=False, depress=current == resolved)
         props.language = language
 
 
