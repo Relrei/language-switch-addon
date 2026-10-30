@@ -14,7 +14,7 @@ Python 3.2 syntax of Blender 2.59.
 bl_info = {
     "name": "Language Switch",
     "author": "togetofu",
-    "version": (1, 8, 0),
+    "version": (1, 8, 1),
     "blender": (2, 59, 0),
     "location": "Top Bar (Info header before 2.80), right end; Ctrl+Shift+L",
     "description": "Switch the interface language between two languages",

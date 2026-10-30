@@ -52,14 +52,15 @@ Blender 2.80 changed the interface a lot, so the zip contains two versions of th
 Notes by version:
 
 - **Blender 2.59 to 2.79**: the buttons are in the Info header, after the scene statistics. In a narrow window they can be pushed off the right end; widen the window, or scroll the header with Ctrl+mouse wheel. These versions cannot show a button as pressed, so the buttons do not show which language is active.
-- **Blender 2.5x**: the Linux builds of Blender 2.5x have no translation files, so the interface stays in English even when Japanese is chosen (the same happens when you change the language in Blender's own settings).
+- **Blender 2.5x**: the interface stays in English even when Japanese is chosen. Translation does not work in Blender 2.5x itself: the language setting is there but not used, and the interface font has no Japanese characters, so changing the language in Blender's own settings does not change it either. Translation works again from Blender 2.60.
 - **Blender 2.80 to 2.92**: workspace tabs are not renamed, because these versions have no translations of the tab names.
 - **Blender 2.80 to 3.6**: reports (the messages in the status bar) are not translated, because these versions cannot translate reports.
 - **Blender 2.59 to 4.1**: installed as a legacy add-on (extensions start with Blender 4.2).
 
 Tested with:
 
-- Blender 2.59, 2.79b, 2.80, 2.83.20 LTS, 3.5.1, 4.2.23 LTS, 5.2.0 LTS and 5.2.1 LTS on Linux
+- Blender 2.59, 2.60a, 2.61, 2.62, 2.63a, 2.64a, 2.65a, 2.66a, 2.67b, 2.70a, 2.74, 2.76b, 2.78c and 2.79b on Linux
+- Blender 2.80, 2.82a, 2.83.20 LTS, 2.91.2, 3.5.1, 4.2.23 LTS, 5.2.0 LTS and 5.2.1 LTS on Linux (2.80, 2.83.20 and 5.2.0 with version 1.8.0, which has the same code for 2.80 and later)
 - Blender 2.93.18 LTS, 3.6.23 LTS and 4.5.15 LTS on Linux (version 1.6.0)
 - Blender 5.3 Alpha on Linux
 - Blender 5.2.3 LTS for Windows, run under Wine on Linux (not yet tested on a real Windows PC)
@@ -118,14 +119,15 @@ Blender 2.80 で画面が大きく変わったので、zip には 2 つの版の
 版ごとの注意:
 
 - **Blender 2.59〜2.79**: ボタンは Info の帯の、シーンの統計の後ろに出ます。窓が狭いと右にはみ出すので、窓を広げるか、Ctrl+ホイールで帯を動かしてください。この版ではボタンを押した見た目にできないので、今どちらの言語かはボタンでは分かりません。
-- **Blender 2.5x**: Linux 版の 2.5x には翻訳のファイルが入っていないので、日本語を選んでも表示は英語のままです(Blender 自身の設定で言語を変えても同じです)。
+- **Blender 2.5x**: 日本語を選んでも表示は英語のままです。2.5x の Blender 自体で翻訳が動いていないためです(言語の設定はあっても使われておらず、画面のフォントにも日本語の文字がありません)。Blender 自身の設定で言語を変えても同じです。翻訳は Blender 2.60 から戻ります。
 - **Blender 2.80〜2.92**: この版にはタブ名の訳が無いので、タブは付け替わりません。
 - **Blender 2.80〜3.6**: この版の Blender にはレポートを翻訳する機能が無いので、レポート(画面下に出るお知らせ)は翻訳されません。
 - **Blender 2.59〜4.1**: 従来のアドオンとして入ります(拡張機能は Blender 4.2 からです)。
 
 試した版:
 
-- Linux の Blender 2.59・2.79b・2.80・2.83.20 LTS・3.5.1・4.2.23 LTS・5.2.0 LTS・5.2.1 LTS
+- Linux の Blender 2.59・2.60a・2.61・2.62・2.63a・2.64a・2.65a・2.66a・2.67b・2.70a・2.74・2.76b・2.78c・2.79b
+- Linux の Blender 2.80・2.82a・2.83.20 LTS・2.91.2・3.5.1・4.2.23 LTS・5.2.0 LTS・5.2.1 LTS(2.80・2.83.20・5.2.0 は 1.8.0 で。2.80 以降の中身は 1.8.1 と同じです)
 - Linux の Blender 2.93.18 LTS・3.6.23 LTS・4.5.15 LTS(1.6.0 で)
 - Linux の Blender 5.3 Alpha
 - Windows 版 Blender 5.2.3 LTS(Linux の Wine の上で。本物の Windows ではまだ試していません)

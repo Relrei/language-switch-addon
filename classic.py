@@ -13,6 +13,7 @@ tooltips, which is what makes the switch visible.
 Keeps to the Python 3.2 syntax of Blender 2.59.
 """
 
+import os
 import zlib
 
 import bpy
@@ -58,9 +59,38 @@ def _languages():
         return result
     try:
         prop = system.bl_rna.properties["language"]
-        return dict((item.identifier, item.name) for item in prop.enum_items)
+        result = dict((item.identifier, item.name) for item in prop.enum_items)
     except Exception:
-        return {}
+        result = {}
+    if len(result) <= 1:
+        # Blender 2.65 builds the list at run time too, but has no Python API to read it.
+        result = _languages_from_file() or result
+    return result
+
+
+_file_languages = None
+
+
+def _languages_from_file():
+    """{identifier: name} from datafiles/locale/languages, the file Blender builds its list from."""
+    global _file_languages
+    if _file_languages is None:
+        _file_languages = {}
+        for kind in ('USER', 'LOCAL', 'SYSTEM'):  # the order in which Blender looks
+            path = os.path.join(bpy.utils.resource_path(kind), "datafiles", "locale", "languages")
+            try:
+                with open(path, encoding="utf-8") as lines:
+                    for line in lines:
+                        # ID:MENULABEL:ISOCODE, ID 0 being a heading.
+                        fields = line.strip().split(":")
+                        if (len(fields) == 3 and not line.startswith("#")
+                                and fields[0] != "0" and fields[2]):
+                            _file_languages[fields[2]] = fields[1]
+            except (IOError, OSError):
+                continue
+            _file_languages['DEFAULT'] = "Default (Default)"
+            break
+    return _file_languages
 
 
 def _english():
