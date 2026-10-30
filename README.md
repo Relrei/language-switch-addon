@@ -36,6 +36,7 @@ Edit > Preferences > Add-ons > **Language Switch**
 - **Use Blender's Language Setting** (on by default): the first button is the language set in Preferences > Interface > Language (shown greyed out). Change it there as usual, for example to French, and the buttons become **FR** / **JA**. The add-on remembers it while the second language is shown, also across restarts, and "Automatic" comes back as "Automatic".
 - **First Language**: the first button, when the option above is off (English by default).
 - **Second Language**: the second button (Japanese by default).
+- **Translate Workspace Tabs** (off by default): the tabs at the top (Layout, Modeling...) are names saved in the file, so Blender does not change them when the language changes. When this is on, the standard tabs are renamed to the new language too. Tabs you renamed yourself are left alone. The file then counts as changed, and it is saved with the names of the language shown at that time.
 
 Pressing Ctrl+Shift+L while another language is shown goes back to the first language.
 
@@ -50,8 +51,8 @@ Notes by version:
 
 Tested with:
 
-- Blender 2.93.18 LTS and 3.6.23 LTS on Linux
-- Blender 4.5.15 LTS, 5.2.0 LTS and 5.2.1 LTS on Linux
+- Blender 3.5.1, 4.2.23 LTS, 5.2.0 LTS and 5.2.1 LTS on Linux
+- Blender 2.93.18 LTS, 3.6.23 LTS and 4.5.15 LTS on Linux (version 1.6.0; 1.7.0 adds the optional workspace tab renaming)
 - Blender 5.3 Alpha on Linux
 - Blender 5.2.3 LTS for Windows, run under Wine on Linux (not yet tested on a real Windows PC)
 
@@ -93,6 +94,7 @@ Blender のインターフェースの言語を、2 つの言語の間でワン�
 - **Use Blender's Language Setting**(既定は ON): 1 つ目のボタンは「設定 > インターフェース > 言語」で選んだ言語になります(灰色で表示)。そこでいつもどおり、例えばフランス語に変えると、ボタンは **FR** / **JA** になります。第 2 言語の表示中もその言語を覚えていて、再起動しても戻れます。「自動」は「自動」のまま戻ります。
 - **First Language**: 上のチェックを外した時の、1 つ目のボタンの言語(既定は英語)。
 - **Second Language**: 2 つ目のボタンの言語(既定は日本語)。
+- **Translate Workspace Tabs**(既定は OFF): 上のタブ(Layout・Modeling など)はファイルに保存される名前なので、Blender は言語を変えても付け替えません。ON にすると、標準のタブも新しい言語の名前に付け替えます。自分で名前を変えたタブは触りません。付け替えるとファイルは「変更あり」になり、保存すると、その時の言語のタブ名で残ります。
 
 どちらでもない言語を表示している時に Ctrl+Shift+L を押すと、1 つ目の言語に戻ります。
 
@@ -107,8 +109,8 @@ Blender 2.93 以降で動きます。それより古い版では有効になり�
 
 試した版:
 
-- Linux の Blender 2.93.18 LTS・3.6.23 LTS
-- Linux の Blender 4.5.15 LTS・5.2.0 LTS・5.2.1 LTS
+- Linux の Blender 3.5.1・4.2.23 LTS・5.2.0 LTS・5.2.1 LTS
+- Linux の Blender 2.93.18 LTS・3.6.23 LTS・4.5.15 LTS(1.6.0 で。1.7.0 で足したのは、既定 OFF のタブの付け替えです)
 - Linux の Blender 5.3 Alpha
 - Windows 版 Blender 5.2.3 LTS(Linux の Wine の上で。本物の Windows ではまだ試していません)
 

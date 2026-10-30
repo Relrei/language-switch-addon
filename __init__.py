@@ -20,7 +20,7 @@ switch add-ons on extensions.blender.org, no code is taken from them.
 bl_info = {
     "name": "Language Switch",
     "author": "togetofu",
-    "version": (1, 6, 0),
+    "version": (1, 7, 0),
     "blender": (2, 93, 0),
     "location": "Top Bar (right end), Ctrl+Shift+L",
     "description": "Switch the interface language between two languages",
@@ -41,6 +41,14 @@ MIN_BLENDER = (2, 93, 0)
 DEFAULT_FIRST = ENGLISH
 DEFAULT_SECOND = 'ja_JP'
 SHORTCUT = dict(type='L', value='PRESS', ctrl=True, shift=True)
+# The workspace tabs of the startup file and of the bundled app templates. Blender names them in
+# the language in effect when a file is created and never renames them, so they are renamed here
+# (only when "Translate Workspace Tabs" is on, since the names are saved in the file).
+WORKSPACE_NAMES = (
+    "2D Animation", "2D Full Canvas", "Animation", "Compositing", "Geometry Nodes", "Layout",
+    "Masking", "Modeling", "Motion Tracking", "Rendering", "Scripting", "Sculpting", "Shading",
+    "Storyboarding", "Texture Paint", "UV Editing", "Video Editing",
+)
 
 _keymaps = []
 # Blender keeps no reference to the items of a dynamic enum, so they are kept here.
@@ -126,9 +134,33 @@ def short_code(language):
     return (language or "?").split("_")[0].split("@")[0].upper()
 
 
+def _workspace_names(view):
+    """{English name: name in the current language} of the standard workspace tabs."""
+    translations = bpy.app.translations
+    workspace = getattr(translations.contexts, "id_workspace", "WorkSpace")
+    use_new_dataname = view.use_translate_new_dataname
+    # pgettext_data() translates only while new data names are translated.
+    view.use_translate_new_dataname = True
+    try:
+        return {name: translations.pgettext_data(name, workspace) for name in WORKSPACE_NAMES}
+    finally:
+        view.use_translate_new_dataname = use_new_dataname
+
+
+def _rename_workspaces(old, new):
+    """Renames the tabs still named as in `old` (or in English) to their name in `new`; tabs
+    renamed by the user are left alone."""
+    for workspace in bpy.data.workspaces:
+        for name in WORKSPACE_NAMES:
+            if workspace.name in (old[name], name) and workspace.name != new[name]:
+                workspace.name = new[name]
+                break
+
+
 def set_language(context, language, remember=True):
     view = context.preferences.view
     prefs = _prefs(context)
+    old_workspace_names = _workspace_names(view) if prefs and prefs.translate_workspaces else None
     if (remember and prefs and prefs.use_blender_language
             and current_language(context) != second_language(context)):
         # The language set in Blender, to come back to from the second language.
@@ -141,6 +173,15 @@ def set_language(context, language, remember=True):
         if hasattr(view, "use_translate_reports"):  # Blender 4.0 and later
             view.use_translate_reports = True
     view.language = language
+    if old_workspace_names is not None:
+        _rename_workspaces(old_workspace_names, _workspace_names(view))
+
+
+def _translate_workspaces_update(self, context):
+    if self.translate_workspaces:
+        # Bring the tabs named in English to the language shown now.
+        english = {name: name for name in WORKSPACE_NAMES}
+        _rename_workspaces(english, _workspace_names(context.preferences.view))
 
 
 def _language_items(self, context):
@@ -192,6 +233,13 @@ class FalconLanguagePreferences(bpy.types.AddonPreferences):
         name="Use Blender's Language Setting",
         description="Use the language set in Preferences > Interface > Language as the first language",
         default=True,
+    )
+    translate_workspaces: BoolProperty(
+        name="Translate Workspace Tabs",
+        description="Also rename the standard workspace tabs (Layout, Modeling...) when switching. "
+                    "Tab names are saved in the file",
+        default=False,
+        update=_translate_workspaces_update,
     )
     # The language set in Blender before switching to the second one ("DEFAULT" for Automatic).
     home_language: StringProperty(
@@ -245,6 +293,7 @@ class FalconLanguagePreferences(bpy.types.AddonPreferences):
         layout.prop(self, "second_language_choice")
         if first_language_resolved(context) == second_language(context):
             layout.label(text=tip_("Choose two different languages"), icon='ERROR')
+        layout.prop(self, "translate_workspaces")
         layout.label(text=tip_("Ctrl+Shift+L switches between these two languages"))
 
 
